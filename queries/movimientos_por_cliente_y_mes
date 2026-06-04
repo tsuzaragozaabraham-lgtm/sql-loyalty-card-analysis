@@ -1,0 +1,51 @@
+-- Autor: Abraham Zaragoza
+-- Fecha: 2026
+-- Descripción: Resumen masivo de compras mensuales
+--              por cliente con tarjeta distinguido.
+--              Muestra estatus ACTIVO/INACTIVO y
+--              monto faltante para activar tarjeta.
+-- Base de datos: SQL Server - TruPos / SAP B1
+
+
+USE TruPos
+GO
+
+DECLARE @FechaInicio DATE = '2026-01-01';
+DECLARE @FechaFin    DATE = '2026-05-31';
+
+SELECT
+    M.PeriodoCardDist               AS Periodo,
+    M.CardCode                      AS NumeroCliente,
+    C.CardName                      AS Cliente,
+    M.CardDist                      AS Tarjeta,
+    M.IdTienda                      AS Tienda,
+    MIN(CONVERT(DATE, M.DocDate))   AS PrimeraCompra,
+    COUNT(M.idMovimiento)           AS NumMovimientos,
+    SUM(M.Total)                    AS TotalMes,
+
+    CASE 
+        WHEN SUM(M.Total) >= 4000 THEN 'ACTIVO'
+        ELSE 'INACTIVO'
+    END AS Estatus,
+
+    CASE 
+        WHEN SUM(M.Total) < 4000 THEN 4000 - SUM(M.Total)
+        ELSE 0
+    END AS LeFalta
+
+FROM TRU_MOS_TB_ClienteDistinguido1 M
+LEFT JOIN OCRD C ON M.CardCode = C.CardCode
+
+WHERE 
+    CONVERT(DATE, M.DocDate) BETWEEN @FechaInicio AND @FechaFin
+
+GROUP BY
+    M.PeriodoCardDist,
+    M.CardCode,
+    C.CardName,
+    M.CardDist,
+    M.IdTienda
+
+ORDER BY 
+    M.PeriodoCardDist ASC,
+    SUM(M.Total) DESC;
