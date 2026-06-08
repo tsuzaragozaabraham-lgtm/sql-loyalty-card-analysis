@@ -5,6 +5,7 @@ Analisis masivo de tarjetas de cliente distinguido - sql server
 **Author:** Abraham Zaragoza  
 **Role target:** Data Analyst / Analista de Datos  
 **Tech stack:** SQL Server, SAP Business One, TruPos POS
+**Se agrega link de dashboard generado en Power BI
 
 ---
 
